@@ -1,3 +1,5 @@
+
+
 // REACT IMPORTS
 import  React, { useState, useEffect, useContext } from 'react'
 
@@ -34,7 +36,8 @@ const Home = () => {
   
   // GET ALL USERS
   const getUsers = async () => {
-    const res = await fetch(DATASERVER_ADDR+'/users',
+    const res = await fetch(process.env.REACT_APP_USERS_MS + '/users',
+      
       {mode: 'cors'})
 
     const usersFromServer = await res.json()
@@ -42,6 +45,8 @@ const Home = () => {
     //console.log(`${usersFromServer.length} users fetched from server`)
   }
 
+
+  console.log("🚀 ~ file: Home.js:38 ~ getUsers ~ process.env.USERS_MS+'/users':", process.env.REACT_APP_USERS_MS+'/users')
   useEffect(()=>{getUsers()},[])
 
   // SET INFORMATION MESSAGES DEPENDING ON USER LOGIN
@@ -133,7 +138,7 @@ const Home = () => {
       {isLoading ? <Loading /> : <>
 
         <AddMovieWrapper categories={ categories } addMovie={addMovie} />      
-        <MoviesCounter movies={movies} />
+        {/* <MoviesCounter movies={movies} /> */}
         
         <div className="filters" style={{marginBottom: "30px"}}>
           <label className='form-label' style={{display: "inline-block", position: "relative", top: "3px"}}>Filter by year:</label>

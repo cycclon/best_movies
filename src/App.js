@@ -28,8 +28,8 @@ const UserRankings = lazy(()=> import('./pages/Statistics'))
 const Footer = lazy(()=> import('./components/Footer'))
 
 function App() {
-  //const DATASERVER_ADDR = 'https://moviesapi.glitch.me/'
-  const DATASERVER_ADDR = 'http://192.168.0.107:3001'
+  const DATASERVER_ADDR = 'https://moviesapi.glitch.me/'
+  // const DATASERVER_ADDR = 'http://192.168.0.107:3001'
   const [showLogin, setShowLogin] = useState(false)
 
   return (

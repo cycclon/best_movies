@@ -23,24 +23,24 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
   const [ showRecommenders, setShowRecommenders] = useState(false)
   const modal = useRef()
 
-  useEffect(()=>{
-    recommendationsCount()    
-  },[])
+  // useEffect(()=>{
+  //   recommendationsCount()    
+  // },[])
 
-  useEffect(()=>{
-    recommendationsCount()
-  },[users])
+  // useEffect(()=>{
+  //   recommendationsCount()
+  // },[users])
 
-  useEffect(()=>{
-    if(showRecommenders){
-      //console.log('show modal here')
-      modal.current.className = 'recommenders'
-      modal.current.show()
-    } else {
-      modal.current.className = 'recommenders hide'
-      delay(300).then(()=> modal.current.close())      
-    }
-  },[showRecommenders])
+  // useEffect(()=>{
+  //   if(showRecommenders){
+  //     //console.log('show modal here')
+  //     modal.current.className = 'recommenders'
+  //     modal.current.show()
+  //   } else {
+  //     modal.current.className = 'recommenders hide'
+  //     delay(300).then(()=> modal.current.close())      
+  //   }
+  // },[showRecommenders])
 
   function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
@@ -48,8 +48,7 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
   
   // WATCH/UNWATCH A MOVIE
   const toggleWatched = async () =>{
-    //console.log(DATASERVER_ADDR)    
-
+    
     const updatedUser = activeUser
 
     // IF WATCHED, UN-WATCH IT
@@ -69,11 +68,11 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
     setActiveUser(updatedUser)
     updatedUser.watchedmovies.includes(movie._id) ? toast.success('Movie marked as watched') 
     : toast.success("Movie marked as NOT watched")
-    //setShowDetails(false)
+    
     setForceUpdate((fu)=>!fu)
   }
 
-  // RECOMMEND/UNRECOMMEND A MOVIE
+  // RECOMMEND/UN-RECOMMEND A MOVIE
   const toggleRecommended = async () => {
     let updatedUser = activeUser
 
@@ -99,9 +98,9 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
 
   const recommendationsCount = async ()=>{
     let count = 0
-    //console.log(users.length)
+    
     users.map(user => {
-      //console.log(user.recommendations.includes(movie._id))
+      
       if(user.recommendations !== undefined) {
         if(user.recommendations.includes(movie._id)){count++}
       }
@@ -135,13 +134,14 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
 
       <span className="movieYear">{movie.year}</span><span> - </span>
 
-      <span className={activeUser.watchedmovies.find((m)=>m===movie._id) ? 'movieName watched' : 'movieName'} 
+      {/* Add this after adding watched movies api: className={activeUser.watchedmovies.find((m)=>m===movie._id) ? 'movieName watched' : 'movieName'} */}
+      <span 
       onClick={(e)=>setShowDetails(!showDetails)} title='Click to show movie details'>{movie.name}</span>
 
-      {activeUser.username !== '' && activeUser.watchedmovies.includes(movie._id) && <CheckBadgeIcon className={activeUser.recommendations.find((m)=>m===movie._id) ? 
+      {/* {activeUser.username !== '' && activeUser.watchedmovies.includes(movie._id) && <CheckBadgeIcon className={activeUser.recommendations.find((m)=>m===movie._id) ? 
       'recommended-icon' : 'not-recommended-icon'} viewBox='0 0 24 24' 
       title={activeUser.recommendations.find((m)=>m===movie._id)?'Click to un-recommend' : 'Click to recommend'}
-      onClick={(e)=>{toggleRecommended()}} /> }
+      onClick={(e)=>{toggleRecommended()}} /> } */}
 
       {rc > 0 && <span className="recommendations-small" title={rc + ' users recommend this movie'}
                   onClick={(e)=>setShowRecommenders(true)}
@@ -151,13 +151,13 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
           <h4 style={{float: "left", maxWidth:"250px"}}>Users who recommended {movie.name}:</h4>
           <button className='btn-close' onClick={(e)=>{setShowRecommenders(false)}}>x</button>
         </div>
-        {users.map(user=>{
+        {/* {users.map(user=>{
           if(user.recommendations.includes(movie._id)){
             //console.log(user.username)
             return <p style={{marginTop: "2px"}} key={user._id}>{user.username}</p>
           }
           return ''
-        })}
+        })} */}
       </dialog>
 
       {movie.nominations.find((nom)=>nom.category===categoryName).winner && 

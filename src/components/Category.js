@@ -20,7 +20,7 @@ const Category = ({ category, movies, forceUpdate, setForceUpdate}) => {
     <div className='category'>
       <FilmIcon className='categoryIcon' viewBox='0 0 22 22'/>
       <span className='categoryTitle'>{category.name}</span>
-      <SmallProgress categoryName={category.name} movies={movies} />
+      {/* <SmallProgress categoryName={category.name} movies={movies} /> */}
       <div className='movies_x_category'>
         {catMovies.length > 0 ? (catMovies.map((movie)=>{
           return <MovieSmall key={movie._id} movie={movie} 

@@ -23,7 +23,7 @@ const Login = ( { showLogin, setShowLogin }) => {
   const [ newUserForm, setNewUserForm ] = useState(false)
   const ActiveUserUpdate = useActiveUserUpdate()
   const users = useUsers()
-  const DATASERVER_ADDR = useContext(ServerContext)
+  const DATASERVER_ADDR = process.env.REACT_APP_USERS_MS
   const [ logginIn, setLogginIn ] = useState(false)
   const modal = useRef()  
 
@@ -69,17 +69,17 @@ const Login = ( { showLogin, setShowLogin }) => {
       toast.error("Username and/or password are incorrect")
       setLogginIn(false)
       return
-    }   
+    }
 
-    //console.log(users.find((u)=>u.username === usernameRef.current.value)._id, passwordRef.current.value)
-
+   
     const result = await fetch(
       DATASERVER_ADDR + `/users/validatepwd/${users.find((u)=>u.username === usernameRef.current.value)._id}`,
          {method: 'POST',
+          
           mode: 'cors', 
          headers: { "Content-Type": "application/json"},
          body: JSON.stringify({ password: passwordRef.current.value})})
-    
+         
     const resultJson = await result.json()
     if(resultJson.validated){
       toast.success('Login successful!')
@@ -106,7 +106,7 @@ const Login = ( { showLogin, setShowLogin }) => {
   return (
     <dialog ref={modal} className="modal">
       <div className="login">
-        <h3>LOGIN</h3>
+        <h3>LOGINN</h3>
         <div className="login-form" style={{paddingBottom: "10px"}}>
           <label className="form-label" >Username:</label>
           <input type="text" className="form-textbox" ref={usernameRef} disabled={logginIn} />
