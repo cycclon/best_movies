@@ -2,11 +2,10 @@ import { toast } from "react-toastify"
 import { useUsers } from "./context/UsersContext"
 import { useState, useRef } from 'react'
 import { useUsersUpdate } from "./context/UsersContext"
-import { ServerContext } from '../App'
 import { useContext } from "react"
 
 const AddUser = ({ setNewUserForm, setUsername }) => {
-  const DATASERVER_ADDR = useContext(ServerContext)
+  const DATASERVER_ADDR = process.env.REACT_APP_USERS_MS
   const setUsers = useUsersUpdate()
   const users = useUsers()
   const [ username, setNewUsername ] = useState('')

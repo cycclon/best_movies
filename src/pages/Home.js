@@ -1,7 +1,7 @@
 
 
 // REACT IMPORTS
-import  React, { useState, useEffect, useContext } from 'react'
+import  React, { useState, useEffect} from 'react'
 
 // COMPONENT IMPORTS
 import Categories from '../components/Categories';
@@ -15,10 +15,8 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 
 // CONTEXT IMPORTS
-import { ServerContext } from '../App';
 import { useLoading, useLoadingUpdate } from '../components/context/LoadingContext';
 import { useActiveUser } from '../components/context/ActiveUserContext';
-import { useUsersUpdate } from '../components/context/UsersContext';
 
 const Home = () => {
   
@@ -26,28 +24,10 @@ const Home = () => {
   const [ movies, setMovies ] = useState([])  
   const [ forceUpdate, setForceUpdate ] = useState(false)
   const [ yearFilter, setYearFilter ] = useState(0)
-  const DATASERVER_ADDR = useContext(ServerContext)
   const isLoading = useLoading()
   const setIsLoading = useLoadingUpdate()
   const activeUser = useActiveUser()
-  const [InfoMessages, setInfoMessages] = useState([])
-  const setUsers = useUsersUpdate()
-  
-  
-  // GET ALL USERS
-  const getUsers = async () => {
-    const res = await fetch(process.env.REACT_APP_USERS_MS + '/users',
-      
-      {mode: 'cors'})
-
-    const usersFromServer = await res.json()
-    setUsers(usersFromServer)
-    //console.log(`${usersFromServer.length} users fetched from server`)
-  }
-
-
-  console.log("🚀 ~ file: Home.js:38 ~ getUsers ~ process.env.USERS_MS+'/users':", process.env.REACT_APP_USERS_MS+'/users')
-  useEffect(()=>{getUsers()},[])
+  const [InfoMessages, setInfoMessages] = useState([])  
 
   // SET INFORMATION MESSAGES DEPENDING ON USER LOGIN
   useEffect(()=>{
@@ -56,15 +36,14 @@ const Home = () => {
     if(activeUser.username !==''){
       setInfoMessages((im)=>[...im,{key: 2, message:'Click on the badge check next to each movie to recommend it. (You must marked it as watched first)'}])
     }
-
   },[activeUser])
-
 
   useEffect(()=>{
     setIsLoading(true)
 
+      // GET CATEGORIES
       const getCategories = async () => {
-        const categoriesFromServer = await fetchData('/categories')
+        const categoriesFromServer = await fetchData(process.env.REACT_APP_MOVIES_MS, '/categories')
         categoriesFromServer.sort((a,b)=>{
           if(a.name < b.name){return -1}
           if(b.name < a.name){return 1}
@@ -73,8 +52,9 @@ const Home = () => {
         setCategories(categoriesFromServer)      
       }
 
+      // GET MOVIES
       const getMovies = async () => {
-        const moviesFromServer = await fetchData('/movies')
+        const moviesFromServer = await fetchData(process.env.REACT_APP_MOVIES_MS, '/movies')
         moviesFromServer.sort((a, b)=>{
           if(a.year>b.year){return -1}
           if(b.year>a.year){return 1}
@@ -93,20 +73,18 @@ const Home = () => {
 
       
         const loadData = async ()=>{
-          await getUsers()
+          //await getUsers()
           await getCategories()
           await getMovies()      
           setIsLoading(false)
-        }
-          
+        }         
     
       loadData();
-
     
   }, [yearFilter])
 
-  const fetchData = async (api) => {
-    const res = await fetch(DATASERVER_ADDR+api,
+  const fetchData = async (server, api) => {
+    const res = await fetch(server+api,
     {mode: 'cors'})
     const data = await res.json()
     return data
@@ -114,7 +92,7 @@ const Home = () => {
 
   // CREATE A NEW MOVIE
   const addMovie = async (movie) =>{
-    const res = await fetch(DATASERVER_ADDR+ '/movies', 
+    const res = await fetch(process.env.REACT_APP_MOVIES_MS +     '/movies', 
     {method: 'POST', headers: {'content-type': 'application/json'}, 
     body: JSON.stringify(movie)})
 
@@ -123,14 +101,6 @@ const Home = () => {
     setMovies([...movies, data])
     toast.success("Movie added!")
   }
-
-  // MODIFIY AN EXISTING MOVIE
-  // const updateMovie = async (updatedMovie)=>{
-  //   const res = await fetch(DATASERVER_ADDR+ `/movies/${updatedMovie._id}`, 
-  //   {method: 'PATCH', headers: {'content-type': 'application/json'}, 
-  //   body: JSON.stringify(updatedMovie)})
-  //   //console.log(res.json())
-  // }  
 
   return (
     <>

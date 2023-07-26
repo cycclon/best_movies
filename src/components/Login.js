@@ -44,8 +44,7 @@ const Login = ( { showLogin, setShowLogin }) => {
   }, [])
 
   useEffect(()=>{
-    if(showLogin){
-      //console.log('show modal here')
+    if(showLogin){      
       modal.current.showModal()
     } else {
       modal.current.close()
@@ -53,7 +52,6 @@ const Login = ( { showLogin, setShowLogin }) => {
   },[showLogin])
 
   const login = async ()=>{
-    //console.log(username, password)
     setLogginIn(true)
 
     if(usernameRef.current.value === '' || passwordRef.current.value === ''){
@@ -61,19 +59,9 @@ const Login = ( { showLogin, setShowLogin }) => {
       setLogginIn(false)
       return
     }
-
-    //console.log(users, usernameRef.current.value)
-
-    //console.log(users)
-    if(!users.find((u)=>u.username === usernameRef.current.value)) {
-      toast.error("Username and/or password are incorrect")
-      setLogginIn(false)
-      return
-    }
-
    
     const result = await fetch(
-      DATASERVER_ADDR + `/users/validatepwd/${users.find((u)=>u.username === usernameRef.current.value)._id}`,
+      DATASERVER_ADDR + `/users/validatepwd/${usernameRef.current.value}`,
          {method: 'POST',
           
           mode: 'cors', 
@@ -81,22 +69,27 @@ const Login = ( { showLogin, setShowLogin }) => {
          body: JSON.stringify({ password: passwordRef.current.value})})
          
     const resultJson = await result.json()
+    console.log("🚀 ~ file: Login.js:72 ~ login ~ resultJson:", resultJson)   
+
     if(resultJson.validated){
       toast.success('Login successful!')
-      sessionStorage.setItem("userID", users.find((u)=>u.username === usernameRef.current.value)._id)
+
+      // GET USER BY USERNAME
+      const res = await fetch(DATASERVER_ADDR + `/users/username/${usernameRef.current.value}`, {mode: 'cors'})
+      const user = await res.json()
+
+      sessionStorage.setItem("userID", user._id)
       if(rememberMeRef.current.value){localStorage.setItem(
-        "userID", users.find((u)=>u.username === usernameRef.current.value)._id)}
-      ActiveUserUpdate(users.find((u)=>u.username === usernameRef.current.value))
+        "userID", user._id)}
+      ActiveUserUpdate(user)
       setShowLogin(false)
     } else {
       toast.error("Username and/or password are incorrect")
       usernameRef.current.value = ''
-      passwordRef.current.value = ''
-      
+      passwordRef.current.value = ''      
     }
 
     setLogginIn(false)
-    //console.log(resultJson.validated )
   }
 
   const setUsername = (name)=>{
@@ -106,7 +99,7 @@ const Login = ( { showLogin, setShowLogin }) => {
   return (
     <dialog ref={modal} className="modal">
       <div className="login">
-        <h3>LOGINN</h3>
+        <h3>LOGIN</h3>
         <div className="login-form" style={{paddingBottom: "10px"}}>
           <label className="form-label" >Username:</label>
           <input type="text" className="form-textbox" ref={usernameRef} disabled={logginIn} />

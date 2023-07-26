@@ -9,7 +9,6 @@ import { toast } from 'react-toastify'
 
 // CONTEXT IMPORTS
 import { useLoading } from './context/LoadingContext'
-import { ServerContext } from '../App'
 import { Link } from 'react-router-dom'
 import Loading from './Loading'
 
@@ -19,7 +18,7 @@ const Header = ({ showLogin, setShowLogin } ) => {
   const ActiveUser = useActiveUser()
   const setActiveUser = useActiveUserUpdate()
   const isLoading = useLoading()
-  const DATASERVER_ADDR = useContext(ServerContext)
+  const DATASERVER_ADDR = process.env.REACT_APP_USERS_MS
   const [hambOpen, setHambOpen] = useState(false)
   const hamb = useRef()
   const mainMenu = useRef()

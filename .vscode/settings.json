@@ -1,8 +1,12 @@
 {
     "cSpell.words": [
         "DATASERVER",
+        "Hamb",
         "heroicons",
+        "loggin",
+        "textbox",
         "toastify",
+        "validatepwd",
         "watchedmovies"
     ],
     "workbench.colorCustomizations": {

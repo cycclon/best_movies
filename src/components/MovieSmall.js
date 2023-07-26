@@ -1,10 +1,8 @@
 import Winner from './Winner'
-//import MovieDetails from './MovieDetails'
 import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { useActiveUser, useActiveUserUpdate } from './context/ActiveUserContext'
 import { toast } from 'react-toastify'
 import { useContext } from 'react'
-import { ServerContext } from '../App'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import { useUsers, useUsersUpdate } from './context/UsersContext'
 import Loading from './Loading'
@@ -15,7 +13,6 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
   const [showDetails, setShowDetails] = useState()  
   const activeUser = useActiveUser()
   const setActiveUser = useActiveUserUpdate()
-  const DATASERVER_ADDR = useContext(ServerContext)
   const [loading, setLoading] = useState(false)
   const users = useUsers()
   const setUsers = useUsersUpdate()
@@ -60,7 +57,7 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
 
     if(activeUser.username !== ''){
       setLoading(true)
-      await fetch(DATASERVER_ADDR+ `/users/${activeUser._id}`, 
+      await fetch(process.env.REACT_APP_USERS_MS + `/users/${activeUser._id}`, 
       {method: 'PATCH', headers: {'content-type': 'application/json'}, body: JSON.stringify(updatedUser)})
       setLoading(false)
     }
@@ -85,7 +82,7 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
 
     if(activeUser.username !== '') {
       setLoading(true)
-      await fetch(DATASERVER_ADDR+ `/users/${activeUser._id}`,
+      await fetch(process.env.REACT_APP_USERS_MS + `/users/${activeUser._id}`,
       {method: 'PATCH', headers: {'content-type': 'application/json'}, body: JSON.stringify(updatedUser)})
       setActiveUser(updatedUser)
       setUsers([...users.filter((u)=>u._id !== updatedUser._id), updatedUser])
