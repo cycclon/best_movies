@@ -1,122 +1,82 @@
 import Winner from './Winner'
 import { useState, useEffect, useRef, lazy, Suspense } from 'react'
-import { useActiveUser, useActiveUserUpdate } from './context/ActiveUserContext'
+import { useActiveUser } from './context/ActiveUserContext'
 import { toast } from 'react-toastify'
-import { useContext } from 'react'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
-import { useUsers, useUsersUpdate } from './context/UsersContext'
 import Loading from './Loading'
 
 const MovieDetails = lazy(()=> import('./MovieDetails'))
 
-const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, setForceUpdate }) => {
+const MovieSmall = ({ movie, showNominationDetails, categoryName, allRecommendations, updateRecommendations }) => {
   const [showDetails, setShowDetails] = useState()  
   const activeUser = useActiveUser()
-  const setActiveUser = useActiveUserUpdate()
   const [loading, setLoading] = useState(false)
-  const users = useUsers()
-  const setUsers = useUsersUpdate()
-  const [rc, setRC] = useState(0)
-  const [ showRecommenders, setShowRecommenders] = useState(false)
-  const modal = useRef()
+  const modal = useRef()  
 
-  // useEffect(()=>{
-  //   recommendationsCount()    
-  // },[])
+  // RETURNS TRUE IF THE USER RECOMMENDED THIS MOVIE
+  const isRecommendedByActiveUser = ()=> {    
+    let recommended = false
+    
+    if(getRecommendations().recommended_by.find(user => user === activeUser.username) !== undefined) {
+      recommended = true
+    }
 
-  // useEffect(()=>{
-  //   recommendationsCount()
-  // },[users])
-
-  // useEffect(()=>{
-  //   if(showRecommenders){
-  //     //console.log('show modal here')
-  //     modal.current.className = 'recommenders'
-  //     modal.current.show()
-  //   } else {
-  //     modal.current.className = 'recommenders hide'
-  //     delay(300).then(()=> modal.current.close())      
-  //   }
-  // },[showRecommenders])
-
-  function delay(time) {
-    return new Promise(resolve => setTimeout(resolve, time));
+    return recommended
   }
+
   
   // WATCH/UNWATCH A MOVIE
   const toggleWatched = async () =>{
     
-    const updatedUser = activeUser
-
-    // IF WATCHED, UN-WATCH IT
-    if(activeUser.watchedmovies.includes(movie._id)){
-      updatedUser.watchedmovies = [...activeUser.watchedmovies.filter((m)=>m!==movie._id)]
-    } else{ // ELSE MARK AS WATCHED
-      updatedUser.watchedmovies.push(movie._id)
-    } 
-
-    if(activeUser.username !== ''){
-      setLoading(true)
-      await fetch(process.env.REACT_APP_USERS_MS + `/users/${activeUser._id}`, 
-      {method: 'PATCH', headers: {'content-type': 'application/json'}, body: JSON.stringify(updatedUser)})
-      setLoading(false)
-    }
-
-    setActiveUser(updatedUser)
-    updatedUser.watchedmovies.includes(movie._id) ? toast.success('Movie marked as watched') 
-    : toast.success("Movie marked as NOT watched")
-    
-    setForceUpdate((fu)=>!fu)
   }
 
   // RECOMMEND/UN-RECOMMEND A MOVIE
   const toggleRecommended = async () => {
-    let updatedUser = activeUser
-
-    // IF RECOMMENDED, UN-RECOMMEND IT
-    if(activeUser.recommendations.includes(movie._id)){
-      updatedUser.recommendations = [...activeUser.recommendations.filter((m)=>m!==movie._id)]
-    } else {
-      updatedUser.recommendations.push(movie._id)
+    
+    // DETERMINE IF RECOMMEND OR UN-RECOMMEND
+    let api = 'recommend'
+    if(isRecommendedByActiveUser()){
+      api = 'un-recommend'
     }
 
-    if(activeUser.username !== '') {
-      setLoading(true)
-      await fetch(process.env.REACT_APP_USERS_MS + `/users/${activeUser._id}`,
-      {method: 'PATCH', headers: {'content-type': 'application/json'}, body: JSON.stringify(updatedUser)})
-      setActiveUser(updatedUser)
-      setUsers([...users.filter((u)=>u._id !== updatedUser._id), updatedUser])
-      setLoading(false)
-    }    
-    
-    updatedUser.recommendations.includes(movie._id) ? toast.success(`Recommended: ${movie.name}`)
-    : toast.success(`${movie.name} un-recommended`)    
+    await fetch(process.env.REACT_APP_RECOMMENDATIONS_MS + `/recommendations/${api}`,
+         {method: 'PATCH',          
+          mode: 'cors', 
+          headers: { "Content-Type": "application/json"},
+          body: JSON.stringify({ movie: movie.name, user: activeUser.username})})
+
+    // SHOW SUCCESS MESSAGE
+    let message
+    if(isRecommendedByActiveUser()) {
+      message = ' un-recommended'
+    } else {
+      message = ' recommended'
+    }
+    toast.success(movie.name + message)
+
+    updateRecommendations()
   }
 
-  const recommendationsCount = async ()=>{
-    let count = 0
-    
-    users.map(user => {
-      
-      if(user.recommendations !== undefined) {
-        if(user.recommendations.includes(movie._id)){count++}
-      }
-
-      return ''
-    });
-    
-    setRC(count)
-    //if(movie.name === 'King Richard'){console.log(rc)}
+  const recommendationsCount = ()=>{
+    return getRecommendations().recommended_by.length
   }
 
   const displayDetails = () => {
     let details = '('
-    movie.nominations.find((n)=>n.category === categoryName).reason.forEach(element => {
+    movie.nominations.find((n)=>n.category === categoryName).reason.forEach(element => {        
       details = details + ' ' + element + ','
     });
     details = details.slice(0, details.length -1)
     details = details + ' )'
     return details
+  }
+
+  const getRecommendations = ()=>{
+    if(allRecommendations !== undefined && allRecommendations.find(r => r.movie === movie.name) != undefined){
+      return allRecommendations.find(r => r.movie === movie.name)
+    } else {
+      return {movie: movie.name, recommended_by: []}
+    }    
   }
 
   return (
@@ -126,8 +86,7 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
         {showDetails && <MovieDetails movie={movie} 
         showDetails={showDetails} setShowDetails={setShowDetails} toggleWatched={toggleWatched}
         loading={loading} />}
-      </Suspense>
-      
+      </Suspense>      
 
       <span className="movieYear">{movie.year}</span><span> - </span>
 
@@ -135,18 +94,16 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, forceUpdate, s
       <span 
       onClick={(e)=>setShowDetails(!showDetails)} title='Click to show movie details'>{movie.name}</span>
 
-      {/* {activeUser.username !== '' && activeUser.watchedmovies.includes(movie._id) && <CheckBadgeIcon className={activeUser.recommendations.find((m)=>m===movie._id) ? 
+      {activeUser.username !== '' && <CheckBadgeIcon className={getRecommendations().recommended_by.find( user => user === activeUser.username) ? 
       'recommended-icon' : 'not-recommended-icon'} viewBox='0 0 24 24' 
-      title={activeUser.recommendations.find((m)=>m===movie._id)?'Click to un-recommend' : 'Click to recommend'}
-      onClick={(e)=>{toggleRecommended()}} /> } */}
+      title={getRecommendations().recommended_by.find( user => user === activeUser.username) ?'Click to un-recommend' : 'Click to recommend'}
+      onClick={(e)=>{toggleRecommended()}} /> }
 
-      {rc > 0 && <span className="recommendations-small" title={rc + ' users recommend this movie'}
-                  onClick={(e)=>setShowRecommenders(true)}
-      >({rc})</span>}
+      {recommendationsCount() > 0 && <span className="recommendations-small" title={recommendationsCount() + ' users recommend this movie'}>({recommendationsCount()})</span>}
       <dialog className='recommenders' ref={modal}>
         <div className='window-header'>
           <h4 style={{float: "left", maxWidth:"250px"}}>Users who recommended {movie.name}:</h4>
-          <button className='btn-close' onClick={(e)=>{setShowRecommenders(false)}}>x</button>
+          <button className='btn-close'>x</button>
         </div>
         {/* {users.map(user=>{
           if(user.recommendations.includes(movie._id)){

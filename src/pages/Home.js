@@ -1,5 +1,3 @@
-
-
 // REACT IMPORTS
 import  React, { useState, useEffect} from 'react'
 
@@ -27,14 +25,28 @@ const Home = () => {
   const isLoading = useLoading()
   const setIsLoading = useLoadingUpdate()
   const activeUser = useActiveUser()
-  const [InfoMessages, setInfoMessages] = useState([])  
+  const [InfoMessages, setInfoMessages] = useState([])
+  const [ allRecommendations, setAllRecommendations] = useState([])
+
+  useEffect(()=>{    
+    async function loadData(){
+      await updateRecommendations()
+    }
+    loadData()
+    
+  },[])
+
+  const updateRecommendations = async ()=> {
+    const recommendations = await fetchData(process.env.REACT_APP_RECOMMENDATIONS_MS, '/recommendations')
+    setAllRecommendations([...recommendations])
+  }
 
   // SET INFORMATION MESSAGES DEPENDING ON USER LOGIN
   useEffect(()=>{
     setInfoMessages((im)=>[{key: 1, message:'Click on each movie title to display it\'s details'}, {key: 3, message:'The number next to each movie title, represents the qty of users that recommended the movie'}])
-    //console.log(InfoMessages.length)
+    
     if(activeUser.username !==''){
-      setInfoMessages((im)=>[...im,{key: 2, message:'Click on the badge check next to each movie to recommend it. (You must marked it as watched first)'}])
+      setInfoMessages((im)=>[...im,{key: 2, message:'Click on the badge check next to each movie to recommend it.'}])
     }
   },[activeUser])
 
@@ -70,25 +82,24 @@ const Home = () => {
 
         setMovies([...filteredMovies])      
       }
-
-      
-        const loadData = async ()=>{
-          //await getUsers()
+               
+        const loadData = async ()=>{     
           await getCategories()
-          await getMovies()      
+          await getMovies()
+                
           setIsLoading(false)
         }         
     
       loadData();
     
-  }, [yearFilter])
+  }, [yearFilter])  
 
   const fetchData = async (server, api) => {
     const res = await fetch(server+api,
     {mode: 'cors'})
     const data = await res.json()
     return data
-  }
+  }  
 
   // CREATE A NEW MOVIE
   const addMovie = async (movie) =>{
@@ -121,8 +132,8 @@ const Home = () => {
         </div>
         
         <Information options={Options().Popup} messages={InfoMessages} /> 
-        <Categories categories={categories} movies={movies}
-        forceUpdate={forceUpdate} setForceUpdate={setForceUpdate} />
+        <Categories categories={categories} movies={movies} 
+        allRecommendations={allRecommendations} updateRecommendations={updateRecommendations} />
       </>}
     </>      
   )

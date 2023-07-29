@@ -1,13 +1,9 @@
 import { toast } from "react-toastify"
-import { useUsers } from "./context/UsersContext"
 import { useState, useRef } from 'react'
-import { useUsersUpdate } from "./context/UsersContext"
 import { useContext } from "react"
 
 const AddUser = ({ setNewUserForm, setUsername }) => {
   const DATASERVER_ADDR = process.env.REACT_APP_USERS_MS
-  const setUsers = useUsersUpdate()
-  const users = useUsers()
   const [ username, setNewUsername ] = useState('')
   const passwordRef = useRef()
   const passwordDuplicateRef = useRef()
@@ -40,9 +36,7 @@ const AddUser = ({ setNewUserForm, setUsername }) => {
       toast.error('You must enter a password')
       setAdding(false)
       return
-    }
-
-    
+    }   
 
     const res = await fetch(DATASERVER_ADDR + '/users',
       {method: 'POST',
@@ -52,8 +46,7 @@ const AddUser = ({ setNewUserForm, setUsername }) => {
     })
 
     const newUser = await res.json()
-    setUsers([...users, newUser])
-
+    
     toast.success('User created!')
     setAdding(false)
     
@@ -63,15 +56,13 @@ const AddUser = ({ setNewUserForm, setUsername }) => {
     passwordRef.current.value = ''
     passwordDuplicateRef.current.value = ''
     setNewUserForm(false)
-  }
-
-  
+  }  
 
   const usernameChanged = (e)=>{
-    setNewUsername(e.target.value)
-    if(username){
-      setAvailable(!users.find((u)=>u.username === e.target.value))
-    }
+    // setNewUsername(e.target.value)
+    // if(username){
+    //   setAvailable(!users.find((u)=>u.username === e.target.value))
+    // }
   }
 
   const showMessage = ()=>{

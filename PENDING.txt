@@ -1,0 +1,1 @@
+Intentar guardar "allRecommendations" en componene "Categories" o "Home" y usar useEffect en dicho componente

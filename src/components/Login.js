@@ -6,7 +6,6 @@ import { toast } from 'react-toastify'
 
 // CONTEXT IMPORTS
 import { useActiveUserUpdate } from "./context/ActiveUserContext"
-import { useUsers } from './context/UsersContext'
 import { ServerContext } from '../App'
 import Loading from "./Loading"
 
@@ -22,7 +21,6 @@ const Login = ( { showLogin, setShowLogin }) => {
   const rememberMeLabel = useRef()
   const [ newUserForm, setNewUserForm ] = useState(false)
   const ActiveUserUpdate = useActiveUserUpdate()
-  const users = useUsers()
   const DATASERVER_ADDR = process.env.REACT_APP_USERS_MS
   const [ logginIn, setLogginIn ] = useState(false)
   const modal = useRef()  

@@ -7,8 +7,8 @@ import Header from './components/Header';
 
 // CONTEXT IMPORTS
 import { ActiveUserProvider } from './components/context/ActiveUserContext';
-import { UsersProvider } from './components/context/UsersContext';
 import { LoadingProvider } from './components/context/LoadingContext';
+import { RecommendationsProvider } from './components/context/RecommendationsContext';
 
 // LAZY COMPONENT IMPORTS
 const NotFound = lazy(()=> import('./pages/NotFound'))
@@ -18,15 +18,14 @@ const UserRankings = lazy(()=> import('./pages/Statistics'))
 const Footer = lazy(()=> import('./components/Footer'))
 
 function App() {
-  const DATASERVER_ADDR = 'https://moviesapi.glitch.me/'
-  // const DATASERVER_ADDR = 'http://192.168.0.107:3001'
+  
   const [showLogin, setShowLogin] = useState(false)
 
   return (
     <div className='wrapper '>      
       <LoadingProvider>
-        <UsersProvider >
-          <ActiveUserProvider>                   
+        <RecommendationsProvider>
+          <ActiveUserProvider>                             
             <Header showLogin={showLogin} setShowLogin={setShowLogin} />
             <Routes >
               <Route path="/" element={<Home showLogin={showLogin} setShowLogin={setShowLogin} />}></Route>
@@ -37,7 +36,7 @@ function App() {
             </Routes>
             <Footer />
           </ActiveUserProvider>
-        </UsersProvider>
+        </RecommendationsProvider>
       </LoadingProvider>      
     </div>
   )
