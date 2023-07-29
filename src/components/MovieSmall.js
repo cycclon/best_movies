@@ -7,7 +7,7 @@ import Loading from './Loading'
 
 const MovieDetails = lazy(()=> import('./MovieDetails'))
 
-const MovieSmall = ({ movie, showNominationDetails, categoryName, allRecommendations, updateRecommendations }) => {
+const MovieSmall = ({ movie, showNominationDetails, categoryName, allRecommendations, updateRecommendations, watchedMovies, updateWatchedMovies }) => {
   const [showDetails, setShowDetails] = useState()  
   const activeUser = useActiveUser()
   const [loading, setLoading] = useState(false)
@@ -22,12 +22,6 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, allRecommendat
     }
 
     return recommended
-  }
-
-  
-  // WATCH/UNWATCH A MOVIE
-  const toggleWatched = async () =>{
-    
   }
 
   // RECOMMEND/UN-RECOMMEND A MOVIE
@@ -84,14 +78,16 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, allRecommendat
 
       <Suspense fallback={<Loading />}>
         {showDetails && <MovieDetails movie={movie} 
-        showDetails={showDetails} setShowDetails={setShowDetails} toggleWatched={toggleWatched}
+        showDetails={showDetails} setShowDetails={setShowDetails}
+        watchedMovies={watchedMovies} updateWatchedMovies={updateWatchedMovies}
         loading={loading} />}
       </Suspense>      
 
       <span className="movieYear">{movie.year}</span><span> - </span>
 
-      {/* Add this after adding watched movies api: className={activeUser.watchedmovies.find((m)=>m===movie._id) ? 'movieName watched' : 'movieName'} */}
+      
       <span 
+      className={watchedMovies.watched_movies.find((m)=>m===movie.name) ? 'movieName watched' : 'movieName'}
       onClick={(e)=>setShowDetails(!showDetails)} title='Click to show movie details'>{movie.name}</span>
 
       {activeUser.username !== '' && <CheckBadgeIcon className={getRecommendations().recommended_by.find( user => user === activeUser.username) ? 

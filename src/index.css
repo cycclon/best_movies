@@ -489,7 +489,7 @@ li[hidden] {
   background: rgba(0, 0, 0, 0.8);
   border: 0;
   width: 100%;
-  top: 120px;
+  top: 0px;
   height: 100%;
   color: var(--main-text-color);
 }
@@ -525,6 +525,7 @@ li[hidden] {
 
 .all-nominations {
   margin: 25px 20px;
+  padding-bottom: 50px;
 }
 
 .light-italic {

@@ -39,7 +39,7 @@ const MoviePoster = ({ movieName }) => {
           
           {Object.entries(movieOMDB).map(([k, v], i)=>{
             if(i>1 && i<17 && (k!=='Poster' && k !== 'Ratings')) {
-              return  (<p><label className='light-italic'>{k}:</label>
+              return  (<p key={k}><label className='light-italic'>{k}:</label>
               <label> {v.toString()}</label></p>)
             }
             return ''

@@ -27,14 +27,26 @@ const Home = () => {
   const activeUser = useActiveUser()
   const [InfoMessages, setInfoMessages] = useState([])
   const [ allRecommendations, setAllRecommendations] = useState([])
+  const [ watchedMovies, setWatchedMovies ] = useState({username: '', watched_movies: []})
 
   useEffect(()=>{    
     async function loadData(){
       await updateRecommendations()
+      await updateWatchedMovies()
     }
-    loadData()
-    
+    loadData()    
   },[])
+
+  //useEffect(()=>{console.log(watchedMovies)},[watchedMovies])
+
+  const updateWatchedMovies = async () => {
+    if(activeUser.username !== ''){
+      const userWatchedMovies = await fetchData(process.env.REACT_APP_WATCHED_MOVIES_MS, `/watched_movies/${activeUser.username}`)
+      setWatchedMovies(userWatchedMovies)
+    } else {
+      setWatchedMovies({username: '', watched_movies: []})
+    }    
+  }
 
   const updateRecommendations = async ()=> {
     const recommendations = await fetchData(process.env.REACT_APP_RECOMMENDATIONS_MS, '/recommendations')
@@ -48,6 +60,12 @@ const Home = () => {
     if(activeUser.username !==''){
       setInfoMessages((im)=>[...im,{key: 2, message:'Click on the badge check next to each movie to recommend it.'}])
     }
+
+    const loadWatchedMovies = async () => {
+      await updateWatchedMovies()
+    }
+    loadWatchedMovies()
+
   },[activeUser])
 
   useEffect(()=>{
@@ -119,7 +137,7 @@ const Home = () => {
       {isLoading ? <Loading /> : <>
 
         <AddMovieWrapper categories={ categories } addMovie={addMovie} />      
-        {/* <MoviesCounter movies={movies} /> */}
+        <MoviesCounter movies={movies} watchedMovies={watchedMovies} />
         
         <div className="filters" style={{marginBottom: "30px"}}>
           <label className='form-label' style={{display: "inline-block", position: "relative", top: "3px"}}>Filter by year:</label>
@@ -133,7 +151,8 @@ const Home = () => {
         
         <Information options={Options().Popup} messages={InfoMessages} /> 
         <Categories categories={categories} movies={movies} 
-        allRecommendations={allRecommendations} updateRecommendations={updateRecommendations} />
+        allRecommendations={allRecommendations} updateRecommendations={updateRecommendations}
+        watchedMovies={watchedMovies} updateWatchedMovies={updateWatchedMovies} />
       </>}
     </>      
   )

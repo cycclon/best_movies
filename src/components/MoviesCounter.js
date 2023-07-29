@@ -1,9 +1,18 @@
 import { useActiveUser } from "./context/ActiveUserContext"
-import { useState } from "react"
 
-const MoviesCounter = ({ movies }) => {
-  const activeUser = useActiveUser()
-  const [ aUser, setAUser ] = useState({username: '', password: '', watchedmovies:[]})
+const MoviesCounter = ({ movies, watchedMovies }) => {
+  const activeUser = useActiveUser()  
+
+  const watchedMoviesCounter = () => {
+    let counter = 0
+    movies.forEach(movie => {
+      if(watchedMovies.watched_movies.find(m => m === movie.name) !== undefined){
+        counter +=1
+      }
+    });
+
+    return counter
+  }
 
   return (
     <div className="counter-wrapper">
@@ -12,34 +21,17 @@ const MoviesCounter = ({ movies }) => {
         <label className="label-counters">{ movies.length}</label><br />
         {activeUser._id &&
         <><label className="form-label">Watched:</label>
-        <label className="label-counters">{ 
-          activeUser.watchedmovies.filter((m)=>{
-            return movies.find((m2)=>{
-              // console.log(m2._id)
-              return m2._id === m
-            })
-          }).length 
-        }</label></>}
+        <label className="label-counters">{watchedMoviesCounter()}</label></>}
       </div>
-      { aUser._id &&
+      { activeUser._id &&
 
       <div className="remaining-wrapper">
         <label className="form-label">Remaining:</label>
-        <label className="remaining">{movies.length - activeUser.watchedmovies.filter((m)=>{
-            return movies.find((m2)=>{
-              // console.log(m2._id)
-              return m2._id === m
-            })
-          }).length }</label>
+        <label className="remaining">{movies.length - watchedMoviesCounter()}</label>
       </div>
       }
       <br />
-      <progress className="large" max="100" value={String(activeUser.watchedmovies.filter((m)=>{
-            return movies.find((m2)=>{
-              // console.log(m2._id)
-              return m2._id === m
-            })
-          }).length /movies.length*100)} ></progress>
+      <progress className="large" max="100" value={String(watchedMoviesCounter() / movies.length*100)} ></progress>
     </div>
   )
 }

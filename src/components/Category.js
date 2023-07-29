@@ -4,7 +4,7 @@ import SmallProgress from './SmallProgress'
 
 
 
-const Category = ({ category, movies, allRecommendations, updateRecommendations}) => {
+const Category = ({ category, movies, allRecommendations, updateRecommendations, watchedMovies, updateWatchedMovies}) => {
   const catMovies = movies.filter((movie)=>movie.nominations.find((nomination)=>nomination.category === category.name))
 
   catMovies.sort((a, b)=>{
@@ -23,11 +23,12 @@ const Category = ({ category, movies, allRecommendations, updateRecommendations}
     <div className='category'>
       <FilmIcon className='categoryIcon' viewBox='0 0 22 22'/>
       <span className='categoryTitle'>{category.name}</span>
-      {/* <SmallProgress categoryName={category.name} movies={movies} /> */}
+      <SmallProgress categoryName={category.name} movies={movies} watchedMovies={watchedMovies} />
       <div className='movies_x_category'>
         {catMovies.length > 0 ? (catMovies.map((movie)=>{
           return <MovieSmall key={movie._id} movie={movie} allRecommendations={allRecommendations} updateRecommendations={updateRecommendations}
-          categoryName={category.name} showNominationDetails={category.showDetails} />
+          categoryName={category.name} showNominationDetails={category.showDetails} 
+          watchedMovies={watchedMovies} updateWatchedMovies={updateWatchedMovies}/>
           })) : ('No movies to show here')}
       </div>
     </div>

@@ -1,25 +1,27 @@
 import { useActiveUser } from "./context/ActiveUserContext"
 
-const SmallProgress = ({ categoryName, movies }) => {
+const SmallProgress = ({ categoryName, movies, watchedMovies }) => {
   const activeUser = useActiveUser()
 
   const totalMovies = ()=>{
     return movies.filter((m)=>m.nominations.filter((n)=>n.category === categoryName).length>0).length
   }
 
-  const watchedMovies = ()=>{
-    const totalM = movies.filter((m)=>m.nominations.filter((n)=>n.category === categoryName).length>0)
-    
-    return totalM.filter((m2)=>{
-      return activeUser.watchedmovies.find((wm)=>wm===m2._id)
-    }).length
-    // return 0
+  const watchedMoviesCounter = ()=>{
+    let counter = 0
+    movies.forEach(movie => {
+      if(movie.nominations.find(n => n.category === categoryName) && watchedMovies.watched_movies.find(m => m === movie.name)) {
+        counter +=1
+      }
+    });
+
+    return counter
   }
 
   const progressAmount = () => {
     let progress = 0
-    if(watchedMovies() && totalMovies()) {
-      progress = watchedMovies() / totalMovies() * 100
+    if(watchedMoviesCounter() && totalMovies()) {
+      progress = watchedMoviesCounter() / totalMovies() * 100
     }
     return progress
   }
@@ -27,7 +29,7 @@ const SmallProgress = ({ categoryName, movies }) => {
   return (
     <div style={{ marginLeft: "10px"}}>
       {activeUser.username !== '' && <><progress className={progressAmount()===100 ? 'small-completed' : 'small'} max="100" value={progressAmount()}>
-        </progress><label className="watchedSmall" >({watchedMovies()}/{totalMovies()})</label></>}      
+        </progress><label className="watchedSmall" >({watchedMoviesCounter()}/{totalMovies()})</label></>}      
     </div>
   )
 }

@@ -2,8 +2,9 @@ import { useEffect, useRef } from 'react'
 import Nomination from './Nomination'
 import { useActiveUser } from './context/ActiveUserContext'
 import MoviePoster from './MoviePoster'
+import { toast } from 'react-toastify'
 
-const MovieDetails = ({ movie, showDetails, setShowDetails, toggleWatched, loading }) => {
+const MovieDetails = ({ movie, showDetails, setShowDetails, loading, watchedMovies, updateWatchedMovies }) => {
   const activeUser = useActiveUser()
   const modal = useRef()
   const markedLabel = useRef()
@@ -48,36 +49,66 @@ const MovieDetails = ({ movie, showDetails, setShowDetails, toggleWatched, loadi
     }
   },[showDetails])
 
+  // WATCH/UNWATCH A MOVIE
+  const toggleWatched = async () =>{
+    let message = ' marked as '
+    let api
+
+    if(isWatchedByActiveUser()) {
+      // UN-WATCH
+      api = 'unwatch'
+      message = message + 'un-watched.'
+    }else {
+      // WATCHED
+      api = 'watch'
+      message = message + 'watched.'
+    }
+
+    await fetch(process.env.REACT_APP_WATCHED_MOVIES_MS + `/watched_movies/${api}/${activeUser.username}`, 
+      { method: 'PATCH', mode: 'cors',
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ movie: movie.name})
+    })
+
+    toast.success(movie.name + message)
+    updateWatchedMovies()
+  }
+
+  const isWatchedByActiveUser = ()=> {
+    return watchedMovies.watched_movies.find(m => m === movie.name) !== undefined
+  }
+
   return (
-    <dialog ref={modal} className='modal' >
+    <dialog ref={modal} className='modal' style={{paddingBottom: '50px'}} >
       <button className='btn btn-right' onClick={()=>{
         showDetails = !showDetails
-        setShowDetails(showDetails)
-        //console.log(showDetails)    
-        
+        setShowDetails(showDetails)                
         }}>Close</button>
-        <label className="movie-title-big">{movie.name} <small>({movie.year})</small></label>
-        <div className="div-centered">
-          <input type="checkbox" className='checkbox' disabled={loading} ref={markWatched}
-          value={activeUser.watchedmovies.includes(movie._id)} 
-          checked={activeUser.watchedmovies.includes(movie._id)} onChange={(e)=>toggleWatched()} />
-          <label ref={markedLabel} className='form-label' disabled={loading}>Mark as watched</label>
-          {activeUser.username === '' && <label className='light-italic'>(Changes will not be saved unless you log-in!)</label>}          
-          {!activeUser.watchedmovies.includes(movie._id) ? <a target='_blank' rel="noreferrer"
-          href={'https://www.google.com/search?q='+setupSearch(movie.name)+'+streaming'} >
-            (Where to watch)</a>:''}
-          <MoviePoster movieName={movie.name} />
-        </div>
 
-        <div className='all-nominations'>
-          <h2>All nominations:</h2>
-          {
-            movie.nominations.map((n)=>{
-              
-              return <Nomination key={n.category} nomination={n}/>
-            })
-          }
-        </div>
+      <label className="movie-title-big">{movie.name} <small>({movie.year})</small></label>
+      <div className="div-centered">
+        <input type="checkbox" className='checkbox' disabled={loading} ref={markWatched}
+        value={isWatchedByActiveUser()} 
+        checked={isWatchedByActiveUser()} onChange={(e)=>toggleWatched()} />        
+        <label ref={markedLabel} className='form-label' disabled={loading}>Mark as watched</label>
+
+        {activeUser.username === '' && <label className='light-italic'>(Changes will not be saved unless you log-in!)</label>}  
+
+        {!isWatchedByActiveUser() ? <a target='_blank' rel="noreferrer"
+        href={'https://www.google.com/search?q='+setupSearch(movie.name)+'+streaming'} >
+          (Where to watch)</a>:''}
+        <MoviePoster movieName={movie.name} />
+      </div>
+
+      <div className='all-nominations'>
+        <h2>All nominations:</h2>
+        {
+          movie.nominations.map((n)=>{
+            
+            return <Nomination key={n.category} nomination={n}/>
+          })
+        }
+      </div>
     </dialog>
   )
 }
