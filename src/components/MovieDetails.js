@@ -4,7 +4,7 @@ import { useActiveUser } from './context/ActiveUserContext'
 import MoviePoster from './MoviePoster'
 import { toast } from 'react-toastify'
 
-const MovieDetails = ({ movie, showDetails, setShowDetails, loading, watchedMovies, updateWatchedMovies }) => {
+const MovieDetails = ({ movie, showDetails, setShowDetails, watchedMovies, updateWatchedMovies }) => {
   const activeUser = useActiveUser()
   const modal = useRef()
   const markedLabel = useRef()
@@ -87,10 +87,10 @@ const MovieDetails = ({ movie, showDetails, setShowDetails, loading, watchedMovi
 
       <label className="movie-title-big">{movie.name} <small>({movie.year})</small></label>
       <div className="div-centered">
-        <input type="checkbox" className='checkbox' disabled={loading} ref={markWatched}
+        <input type="checkbox" className='checkbox' ref={markWatched}
         value={isWatchedByActiveUser()} 
         checked={isWatchedByActiveUser()} onChange={(e)=>toggleWatched()} />        
-        <label ref={markedLabel} className='form-label' disabled={loading}>Mark as watched</label>
+        <label ref={markedLabel} className='form-label' >Mark as watched</label>
 
         {activeUser.username === '' && <label className='light-italic'>(Changes will not be saved unless you log-in!)</label>}  
 

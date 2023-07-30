@@ -1,4 +1,3 @@
-import { StarIcon } from '@heroicons/react/24/outline'
 import Winner from './Winner'
 
 const Nomination = ({ nomination }) => {

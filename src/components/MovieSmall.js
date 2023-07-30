@@ -1,5 +1,5 @@
 import Winner from './Winner'
-import { useState, useEffect, useRef, lazy, Suspense } from 'react'
+import { useState, useRef, lazy, Suspense } from 'react'
 import { useActiveUser } from './context/ActiveUserContext'
 import { toast } from 'react-toastify'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
@@ -10,7 +10,6 @@ const MovieDetails = lazy(()=> import('./MovieDetails'))
 const MovieSmall = ({ movie, showNominationDetails, categoryName, allRecommendations, updateRecommendations, watchedMovies, updateWatchedMovies }) => {
   const [showDetails, setShowDetails] = useState()  
   const activeUser = useActiveUser()
-  const [loading, setLoading] = useState(false)
   const modal = useRef()  
 
   // RETURNS TRUE IF THE USER RECOMMENDED THIS MOVIE
@@ -66,7 +65,7 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, allRecommendat
   }
 
   const getRecommendations = ()=>{
-    if(allRecommendations !== undefined && allRecommendations.find(r => r.movie === movie.name) != undefined){
+    if(allRecommendations !== undefined && allRecommendations.find(r => r.movie === movie.name) !== undefined){
       return allRecommendations.find(r => r.movie === movie.name)
     } else {
       return {movie: movie.name, recommended_by: []}
@@ -79,8 +78,7 @@ const MovieSmall = ({ movie, showNominationDetails, categoryName, allRecommendat
       <Suspense fallback={<Loading />}>
         {showDetails && <MovieDetails movie={movie} 
         showDetails={showDetails} setShowDetails={setShowDetails}
-        watchedMovies={watchedMovies} updateWatchedMovies={updateWatchedMovies}
-        loading={loading} />}
+        watchedMovies={watchedMovies} updateWatchedMovies={updateWatchedMovies} />}
       </Suspense>      
 
       <span className="movieYear">{movie.year}</span><span> - </span>

@@ -1,12 +1,11 @@
 // REACT IMPORTS
-import { useState, useContext, useEffect, useRef, lazy, Suspense } from "react"
+import { useState, useEffect, useRef, lazy, Suspense } from "react"
 
 // LIBRARY IMPORTS
 import { toast } from 'react-toastify'
 
 // CONTEXT IMPORTS
 import { useActiveUserUpdate } from "./context/ActiveUserContext"
-import { ServerContext } from '../App'
 import Loading from "./Loading"
 
 // COMPONENT IMPORTS

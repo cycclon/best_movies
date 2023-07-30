@@ -20,7 +20,6 @@ const Home = () => {
   
   const [ categories, setCategories ] = useState([])
   const [ movies, setMovies ] = useState([])  
-  const [ forceUpdate, setForceUpdate ] = useState(false)
   const [ yearFilter, setYearFilter ] = useState(0)
   const isLoading = useLoading()
   const setIsLoading = useLoadingUpdate()
