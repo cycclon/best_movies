@@ -1,5 +1,5 @@
 // REACT IMPORTS
-import { useEffect, useContext, useState, useRef, lazy, Suspense } from 'react'
+import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 
 import { StarIcon, HomeIcon, ArrowTrendingUpIcon, CreditCardIcon, QuestionMarkCircleIcon   } from '@heroicons/react/24/outline'
 import { useActiveUser, useActiveUserUpdate } from './context/ActiveUserContext'
@@ -17,8 +17,7 @@ const Login = lazy(()=> import('./Login'))
 const Header = ({ showLogin, setShowLogin } ) => {
   const ActiveUser = useActiveUser()
   const setActiveUser = useActiveUserUpdate()
-  const isLoading = useLoading()
-  const DATASERVER_ADDR = process.env.REACT_APP_USERS_MS
+  const isLoading = useLoading()   
   const [hambOpen, setHambOpen] = useState(false)
   const hamb = useRef()
   const mainMenu = useRef()
@@ -34,7 +33,7 @@ const Header = ({ showLogin, setShowLogin } ) => {
         if(sessionStorage.getItem("userID")) {usrID = sessionStorage.getItem("userID")}
         else {usrID = localStorage.getItem("userID")}
     
-        const res = await fetch(DATASERVER_ADDR+`/users/${usrID}`,
+        const res = await fetch(process.env.REACT_APP_USERS_MS+`/users/${usrID}`,
           {mode: 'cors'})
     
         const userFromServer = await res.json()
@@ -46,6 +45,7 @@ const Header = ({ showLogin, setShowLogin } ) => {
       getUser()
 
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
   useEffect(()=>{
@@ -65,7 +65,7 @@ const Header = ({ showLogin, setShowLogin } ) => {
     <div className='header'>
       <div style={{textAlign: "center"}}>
         <StarIcon className="titleIcon" viewBox='0 0 22 22' />      
-        <h1 className='font-effect-emboss'>BEST MOVIES<br/><small>(Oscar winners and nomenees)</small></h1>
+        <h1 className='font-effect-emboss'>BEST MOVIES<br/><small>(Oscar winners and nominees)</small></h1>
       </div>      
       
       {/* MENU */}
@@ -82,7 +82,7 @@ const Header = ({ showLogin, setShowLogin } ) => {
         <ul>
           <li><Link to='/'><HomeIcon className='menu-icon' viewBox='0 0 22 22' />Home</Link></li>
           <li><Link to='/statistics'><ArrowTrendingUpIcon className='menu-icon' viewBox='0 0 22 22' />Statistics</Link></li>
-          <li><a href='https://www.paypal.com/donate/?hosted_button_id=YV3874VHEJ5R8' target='_blank'><CreditCardIcon className='menu-icon' viewBox='0 0 22 22' />Donate</a></li>
+          <li><a href='https://www.paypal.com/donate/?hosted_button_id=YV3874VHEJ5R8' target='_blank' rel="noreferrer"><CreditCardIcon className='menu-icon' viewBox='0 0 22 22' />Donate</a></li>
           <li><Link to='/about'><QuestionMarkCircleIcon className='menu-icon' viewBox='0 0 22 22' />About</Link></li>          
         </ul>
       </div>

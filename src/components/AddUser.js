@@ -1,13 +1,12 @@
 import { toast } from "react-toastify"
 import { useState, useRef } from 'react'
-import { useContext } from "react"
 
 const AddUser = ({ setNewUserForm, setUsername }) => {
   const DATASERVER_ADDR = process.env.REACT_APP_USERS_MS
   const [ username, setNewUsername ] = useState('')
   const passwordRef = useRef()
   const passwordDuplicateRef = useRef()
-  const [ available, setAvailable ] = useState(true)
+  const [ available] = useState(true)
   const [ adding, setAdding] = useState(false)
 
   const addUser = async (e) => {
@@ -38,14 +37,12 @@ const AddUser = ({ setNewUserForm, setUsername }) => {
       return
     }   
 
-    const res = await fetch(DATASERVER_ADDR + '/users',
+    await fetch(DATASERVER_ADDR + '/users',
       {method: 'POST',
       mode: 'cors', 
       headers: { "Content-Type": "application/json"},
       body: JSON.stringify({ username: username, password: passwordRef.current.value})
-    })
-
-    const newUser = await res.json()
+    })   
     
     toast.success('User created!')
     setAdding(false)
